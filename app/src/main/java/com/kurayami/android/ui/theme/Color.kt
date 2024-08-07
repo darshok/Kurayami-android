@@ -1,4 +1,4 @@
-package com.kurayami.player.ui.theme
+package com.kurayami.android.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
