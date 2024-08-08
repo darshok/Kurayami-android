@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "KurayamiAndroid"
+rootProject.name = "Kurayami"
 include(":app")
  
