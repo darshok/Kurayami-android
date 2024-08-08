@@ -72,5 +72,6 @@ dependencies {
     implementation(libs.dagger.hilt)
     ksp(libs.dagger.hilt.compiler)
     implementation(libs.androidx.activity)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.ktx)
 }

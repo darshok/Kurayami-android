@@ -1,4 +1,4 @@
-package com.kurayami.android
+package com.kurayami.android.ui.screen.main
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -6,23 +6,35 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.kurayami.android.ui.theme.KurayamiAndroidTheme
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.kurayami.android.R
+import com.kurayami.android.ui.theme.KurayamiTheme
 import dagger.hilt.android.AndroidEntryPoint
-import dagger.hilt.android.HiltAndroidApp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        installSplashScreen()
+        super.onCreate(savedInstanceState)
         setContent {
-            KurayamiAndroidTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+            KurayamiTheme {
+                Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+                    TopAppBar(title = {
+                        getString(
+                            R.string.app_name
+                        )
+                    })
+                }) { innerPadding ->
                     Greeting(
                         name = "Android",
                         modifier = Modifier.padding(innerPadding)
@@ -44,7 +56,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    KurayamiAndroidTheme {
+    KurayamiTheme {
         Greeting("Android")
     }
 }
