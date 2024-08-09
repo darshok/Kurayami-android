@@ -24,12 +24,23 @@ android {
     }
 
     buildTypes {
-        release {
+        val clientId = "20396"
+        debug {
+            isDebuggable = true
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("int", "CLIENT_ID", clientId)
+        }
+        release {
+            isMinifyEnabled = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            buildConfigField("int", "CLIENT_ID", clientId)
         }
     }
     compileOptions {
@@ -41,6 +52,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -74,4 +86,9 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
 }
