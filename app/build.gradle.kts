@@ -86,4 +86,9 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
 }

@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">Kurayami</string>
     <string name="login">Login</string>
+    <string name="logout">Logout</string>
     <string name="no_app_found_for_this_action">No app found for this action</string>
 </resources>
