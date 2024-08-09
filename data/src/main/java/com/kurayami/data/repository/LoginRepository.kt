@@ -1,4 +1,4 @@
-package com.kurayami.android.data.repository
+package com.kurayami.data.repository
 
 import android.net.Uri
 

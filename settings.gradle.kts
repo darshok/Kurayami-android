@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Kurayami"
 include(":app")
- 
+include(":data")

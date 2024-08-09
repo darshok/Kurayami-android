@@ -3,8 +3,8 @@ package com.kurayami.android.ui.screen.main
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.kurayami.android.data.repository.LoginRepository
-import com.kurayami.android.data.repository.PreferencesDataStoreRepository
+import com.kurayami.data.repository.LoginRepository
+import com.kurayami.data.repository.PreferencesDataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
