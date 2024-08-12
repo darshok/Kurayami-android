@@ -1,4 +1,4 @@
-package com.kurayami.android.common
+package com.kurayami.common
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences

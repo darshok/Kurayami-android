@@ -1,4 +1,4 @@
-package com.kurayami.android.di
+package com.kurayami.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore

@@ -1,8 +1,8 @@
-package com.kurayami.android.data.repository.impl
+package com.kurayami.data.repository.impl
 
 import android.net.Uri
-import com.kurayami.android.data.repository.LoginRepository
-import com.kurayami.android.data.repository.PreferencesDataStoreRepository
+import com.kurayami.data.repository.LoginRepository
+import com.kurayami.data.repository.PreferencesDataStoreRepository
 import javax.inject.Inject
 import javax.inject.Singleton
 

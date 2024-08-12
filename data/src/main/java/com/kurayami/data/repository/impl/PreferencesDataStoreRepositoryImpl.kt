@@ -1,12 +1,12 @@
-package com.kurayami.android.data.repository.impl
+package com.kurayami.data.repository.impl
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.kurayami.android.common.getValue
-import com.kurayami.android.common.setValue
-import com.kurayami.android.data.repository.PreferencesDataStoreRepository
+import com.kurayami.common.getValue
+import com.kurayami.common.setValue
+import com.kurayami.data.repository.PreferencesDataStoreRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
