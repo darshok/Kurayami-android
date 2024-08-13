@@ -6,12 +6,14 @@ plugins {
     alias(libs.plugins.google.ksp)
 }
 
+val appPackageName = "com.kurayami.android"
+
 android {
-    namespace = "com.kurayami.android"
+    namespace = appPackageName
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.kurayami.android"
+        applicationId = appPackageName
         minSdk = 24
         targetSdk = 35
         versionCode = 1
