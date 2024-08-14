@@ -3,10 +3,13 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.ksp)
+    alias(libs.plugins.apollo)
 }
 
+val dataPackageName = "com.kurayami.data"
+
 android {
-    namespace = "com.kurayami.data"
+    namespace = dataPackageName
     compileSdk = 34
 
     defaultConfig {
@@ -34,6 +37,16 @@ android {
     }
 }
 
+apollo {
+    service("service") {
+        packageName.set(dataPackageName)
+        introspection {
+            endpointUrl.set("https://graphql.anilist.co")
+            schemaFile.set(file("src/main/graphql/schema.graphqls"))
+        }
+    }
+}
+
 dependencies {
 
     // Core
@@ -53,4 +66,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Apollo
+    implementation(libs.apollo.runtime)
+    implementation(libs.apollo.normalized.cache)
 }

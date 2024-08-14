@@ -15,6 +15,7 @@ hilt = "2.52"
 ksp = "2.0.10-1.0.24"
 appcompat = "1.7.0"
 material = "1.12.0"
+apollo = "4.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +44,8 @@ dagger-hilt = { group = "com.google.dagger", name = "hilt-android", version.ref 
 dagger-hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo"}
+apollo-normalized-cache = { module = "com.apollographql.apollo:apollo-normalized-cache", version.ref = "apollo"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -51,3 +54,4 @@ compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+apollo = { id = "com.apollographql.apollo", version.ref = "apollo" }
