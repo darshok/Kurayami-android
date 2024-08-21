@@ -87,6 +87,10 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Paging
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+
     // Compose
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.activity.compose)
@@ -94,6 +98,7 @@ dependencies {
 
     // Hilt
     implementation(libs.dagger.hilt)
+    implementation(libs.hilt.navigation.compose)
     ksp(libs.dagger.hilt.compiler)
 
     // Coroutines

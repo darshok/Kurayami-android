@@ -54,6 +54,13 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
 
+    // Okhttp
+    implementation(libs.okhttp.logging.interceptor)
+
+    // Paging
+    implementation(libs.androidx.paging.runtime)
+    implementation(libs.androidx.paging.compose)
+
     // Hilt
     implementation(libs.dagger.hilt)
     ksp(libs.dagger.hilt.compiler)
