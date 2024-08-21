@@ -17,11 +17,14 @@ class AuthorizationInterceptor(private val preferencesDataStoreRepository: Prefe
         chain: HttpInterceptorChain,
     ): HttpResponse {
         return runBlocking {
-            val newRequest = request.newBuilder()
-                .addHeader(
-                    "Authorization",
-                    "Bearer ${preferencesDataStoreRepository.getAccessToken().first()}"
-                ).build()
+            val newRequest = request.newBuilder().apply {
+                preferencesDataStoreRepository.getAccessToken().first()?.let {
+                    addHeader(
+                        "Authorization",
+                        "Bearer $it"
+                    )
+                }
+            }.build()
             chain.proceed(newRequest)
         }
     }

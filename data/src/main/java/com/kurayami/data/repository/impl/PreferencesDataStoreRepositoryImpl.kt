@@ -9,9 +9,7 @@ import com.kurayami.common.setValue
 import com.kurayami.data.repository.PreferencesDataStoreRepository
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
 class PreferencesDataStoreRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
 ) : PreferencesDataStoreRepository {

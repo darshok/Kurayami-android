@@ -1,0 +1,23 @@
+query MediaTopChart($page: Int, $perPage: Int, $type: MediaType, $sort: [MediaSort]) {
+    Page(page: $page, perPage: $perPage) {
+        media(type: $type, sort: $sort) {
+            id
+            title {
+                userPreferred
+            }
+            seasonYear
+            meanScore
+            averageScore
+            studios(isMain: true) {
+                nodes {
+                    name
+                }
+            }
+            format
+        }
+        pageInfo {
+            currentPage
+            hasNextPage
+        }
+    }
+}
