@@ -2,7 +2,7 @@ package com.kurayami.data.repository.impl
 
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import com.kurayami.data.repository.MediaPagingSource
+import com.kurayami.data.source.api.MediaPagingSource
 import com.kurayami.data.repository.MediaRepository
 import com.kurayami.data.source.api.MediaApi
 import com.kurayami.data.type.MediaSort

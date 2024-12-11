@@ -84,8 +84,13 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.valentinilk.shimmer)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // Image
+    implementation(libs.io.coil.kt.compose)
+    implementation(libs.io.coil.kt.network.okhttp)
 
     // Paging
     implementation(libs.androidx.paging.runtime)

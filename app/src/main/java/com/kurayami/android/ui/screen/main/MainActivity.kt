@@ -5,15 +5,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,13 +28,13 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import coil3.compose.AsyncImagePainter
+import coil3.compose.rememberAsyncImagePainter
 import com.kurayami.android.R
 import com.kurayami.android.ui.theme.KurayamiTheme
 import com.kurayami.data.MediaTopChartQuery
 import com.kurayami.data.type.MediaFormat
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -38,15 +42,15 @@ class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         installSplashScreen()
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         viewModel.manageIntentData(intent.data)
 
         setContent {
             KurayamiTheme {
-                BaseScaffold()
+                BaseScaffold(viewModel)
             }
         }
     }
@@ -54,17 +58,15 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BaseScaffold(viewModel: MainViewModel = hiltViewModel()) {
-    val userLoggedIn = runBlocking {
-        viewModel.isUserLoggedIn.first()
-    }
-
-    val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsStateWithLifecycle(userLoggedIn)
+fun BaseScaffold(viewModel: MainViewModel) {
+    val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsStateWithLifecycle(false)
 
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(title = {
-            stringResource(
-                R.string.app_name
+            Text(
+                stringResource(
+                    R.string.top_anime_title
+                )
             )
         })
     }) { innerPadding ->
@@ -85,7 +87,7 @@ fun BaseScaffold(viewModel: MainViewModel = hiltViewModel()) {
 @Composable
 fun TopAnimeChart(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val topAnimeList = uiState.media.collectAsLazyPagingItems()
+    val topAnimeList = viewModel.topChartFlow.collectAsLazyPagingItems()
 
     LazyColumn(
         modifier = modifier
@@ -104,8 +106,8 @@ fun TopAnimeChart(modifier: Modifier = Modifier, viewModel: MainViewModel = hilt
 @Composable
 fun AnimeCard(anime: MediaTopChartQuery.Medium, index: Int) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+        modifier = Modifier.fillMaxWidth().height(140.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
     ) {
         CardContent(Modifier.padding(8.dp), anime, index)
@@ -114,11 +116,18 @@ fun AnimeCard(anime: MediaTopChartQuery.Medium, index: Int) {
 
 @Composable
 fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int) {
-    Box {
+    val imagePainter = rememberAsyncImagePainter(model = anime.coverImage?.large)
+    val transition by animateFloatAsState(
+            targetValue = if (imagePainter.state.collectAsState().value is AsyncImagePainter.State.Success) 1f else 0f, label = "loadingTransition",
+    )
+    Box(
+        modifier = Modifier.alpha(transition)
+    ) {
         Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .clip(RoundedCornerShape(bottomStart = 16.dp, topEnd = 8.dp)).background(MaterialTheme.colorScheme.onPrimaryContainer)
+                .clip(RoundedCornerShape(bottomStart = 16.dp, topEnd = 8.dp))
+                .background(MaterialTheme.colorScheme.onPrimaryContainer)
         ) {
             Text(
                 modifier = modifier,
@@ -128,17 +137,29 @@ fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int
                 color = MaterialTheme.colorScheme.onTertiary
             )
         }
-        Column(modifier = modifier.fillMaxWidth()) {
-            Text(
-                modifier = modifier,
-                text = anime.title?.userPreferred ?: "No title",
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                modifier = modifier.clip(RoundedCornerShape(8.dp)),
+                painter = imagePainter,
+                contentDescription = "anime thumbnail",
             )
-            Row(modifier) {
-                Text(text = anime.seasonYear?.toString() ?: "---", fontSize = 16.sp)
-                Text(modifier = Modifier.padding(horizontal = 8.dp), text = "-", fontSize = 16.sp)
-                Text(text = anime.averageScore?.toString() ?: "---", fontSize = 16.sp)
+            Column(modifier = modifier.fillMaxWidth()) {
+                Text(
+                    modifier = modifier,
+                    text = anime.title?.userPreferred ?: "No title",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                )
+                Row(modifier) {
+                    val subtitleFontSize = 16.sp
+                    Text(text = anime.seasonYear?.toString() ?: "---", fontSize = subtitleFontSize)
+                    Text(
+                        modifier = Modifier.padding(horizontal = 8.dp),
+                        text = "-",
+                        fontSize = subtitleFontSize
+                    )
+                    Text(text = anime.averageScore?.toString() ?: "---", fontSize = subtitleFontSize)
+                }
             }
         }
     }
@@ -173,6 +194,7 @@ fun AnimeCardPreview() {
             averageScore = 98,
             studios = MediaTopChartQuery.Studios(listOf(MediaTopChartQuery.Node(name = "Studio"))),
             format = MediaFormat.TV,
+            coverImage = MediaTopChartQuery.CoverImage(large = "")
         ),
         index = 1
     )

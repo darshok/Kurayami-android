@@ -1,9 +1,8 @@
-package com.kurayami.data.repository
+package com.kurayami.data.source.api
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.kurayami.data.MediaTopChartQuery
-import com.kurayami.data.source.api.MediaApi
 import com.kurayami.data.type.MediaSort
 import com.kurayami.data.type.MediaType
 import java.io.IOException
