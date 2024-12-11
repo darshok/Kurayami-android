@@ -7,6 +7,9 @@ query MediaTopChart($page: Int, $perPage: Int, $type: MediaType, $sort: [MediaSo
             }
             seasonYear
             meanScore
+            coverImage {
+                large
+            }
             averageScore
             studios(isMain: true) {
                 nodes {
