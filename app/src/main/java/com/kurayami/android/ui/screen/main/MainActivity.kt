@@ -131,7 +131,7 @@ fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int
         label = "loadingTransition",
     )
     Box(
-        modifier = Modifier.alpha(1f)
+        modifier = Modifier.alpha(transition)
     ) {
         Row(
             modifier = Modifier
