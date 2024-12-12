@@ -10,7 +10,7 @@ val appPackageName = "com.kurayami.android"
 
 android {
     namespace = appPackageName
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = appPackageName

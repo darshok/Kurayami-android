@@ -25,12 +25,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil3.compose.AsyncImagePainter
 import coil3.compose.rememberAsyncImagePainter
 import com.kurayami.android.R
+import com.kurayami.android.ui.screen.main.composable.BottomNavigation
 import com.kurayami.android.ui.theme.KurayamiTheme
 import com.kurayami.data.MediaTopChartQuery
 import com.kurayami.data.type.MediaFormat
@@ -49,8 +50,11 @@ class MainActivity : ComponentActivity() {
         viewModel.manageIntentData(intent.data)
 
         setContent {
+            val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsStateWithLifecycle(false)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val topAnimeList = viewModel.topChartFlow.collectAsLazyPagingItems()
             KurayamiTheme {
-                BaseScaffold(viewModel)
+                BaseScaffold(isUserLoggedIn, uiState, topAnimeList)
             }
         }
     }
@@ -58,9 +62,11 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BaseScaffold(viewModel: MainViewModel) {
-    val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsStateWithLifecycle(false)
-
+fun BaseScaffold(
+    isUserLoggedIn: Boolean,
+    uiState: MediaTopChartUiState,
+    topAnimeList: LazyPagingItems<MediaTopChartQuery.Medium>
+) {
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(title = {
             Text(
@@ -69,9 +75,11 @@ fun BaseScaffold(viewModel: MainViewModel) {
                 )
             )
         })
+    }, bottomBar = {
+        BottomNavigation()
     }) { innerPadding ->
         // TODO: provisional way to test pagination
-        TopAnimeChart(modifier = Modifier.padding(innerPadding))
+        TopAnimeChart(modifier = Modifier.padding(innerPadding), uiState, topAnimeList)
 
         // TODO: provisional way to test login/logout
 //        if (isUserLoggedIn) {
@@ -85,14 +93,15 @@ fun BaseScaffold(viewModel: MainViewModel) {
 }
 
 @Composable
-fun TopAnimeChart(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val topAnimeList = viewModel.topChartFlow.collectAsLazyPagingItems()
-
+fun TopAnimeChart(
+    modifier: Modifier = Modifier,
+    uiState: MediaTopChartUiState,
+    topAnimeList: LazyPagingItems<MediaTopChartQuery.Medium>
+) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(8.dp),
+            .padding(horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(topAnimeList.itemCount) { index ->
@@ -106,7 +115,7 @@ fun TopAnimeChart(modifier: Modifier = Modifier, viewModel: MainViewModel = hilt
 @Composable
 fun AnimeCard(anime: MediaTopChartQuery.Medium, index: Int) {
     Card(
-        modifier = Modifier.fillMaxWidth().height(140.dp),
+        modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
     ) {
@@ -118,10 +127,11 @@ fun AnimeCard(anime: MediaTopChartQuery.Medium, index: Int) {
 fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int) {
     val imagePainter = rememberAsyncImagePainter(model = anime.coverImage?.large)
     val transition by animateFloatAsState(
-            targetValue = if (imagePainter.state.collectAsState().value is AsyncImagePainter.State.Success) 1f else 0f, label = "loadingTransition",
+        targetValue = if (imagePainter.state.collectAsState().value is AsyncImagePainter.State.Success) 1f else 0f,
+        label = "loadingTransition",
     )
     Box(
-        modifier = Modifier.alpha(transition)
+        modifier = Modifier.alpha(1f)
     ) {
         Row(
             modifier = Modifier
@@ -137,9 +147,15 @@ fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int
                 color = MaterialTheme.colorScheme.onTertiary
             )
         }
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = modifier.padding(end = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Image(
-                modifier = modifier.clip(RoundedCornerShape(8.dp)),
+                modifier = modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .height(140.dp)
+                    .width(100.dp),
                 painter = imagePainter,
                 contentDescription = "anime thumbnail",
             )
@@ -158,7 +174,10 @@ fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int
                         text = "-",
                         fontSize = subtitleFontSize
                     )
-                    Text(text = anime.averageScore?.toString() ?: "---", fontSize = subtitleFontSize)
+                    Text(
+                        text = anime.averageScore?.toString() ?: "---",
+                        fontSize = subtitleFontSize
+                    )
                 }
             }
         }
