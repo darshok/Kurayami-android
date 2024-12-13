@@ -5,7 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,8 +19,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,7 +56,7 @@ class MainActivity : ComponentActivity() {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val topAnimeList = viewModel.topChartFlow.collectAsLazyPagingItems()
             KurayamiTheme {
-                BaseScaffold(isUserLoggedIn, uiState, topAnimeList)
+                BaseScaffold(isUserLoggedIn, uiState, topAnimeList, viewModel::logout)
             }
         }
     }
@@ -65,7 +67,8 @@ class MainActivity : ComponentActivity() {
 fun BaseScaffold(
     isUserLoggedIn: Boolean,
     uiState: MediaTopChartUiState,
-    topAnimeList: LazyPagingItems<MediaTopChartQuery.Medium>
+    topAnimeList: LazyPagingItems<MediaTopChartQuery.Medium>,
+    logoutAction: () -> Unit
 ) {
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(title = {
@@ -81,11 +84,11 @@ fun BaseScaffold(
         // TODO: provisional way to test pagination
         TopAnimeChart(modifier = Modifier.padding(innerPadding), uiState, topAnimeList)
 
-        // TODO: provisional way to test login/logout
+//        // TODO: provisional way to test login/logout
 //        if (isUserLoggedIn) {
 //            LogoutButtonLayout(
 //                modifier = Modifier.padding(innerPadding),
-//                onClickLogout = { viewModel.logout() })
+//                onClickLogout = { logoutAction() })
 //        } else {
 //            LoginLayout(modifier = Modifier.padding(innerPadding))
 //        }
@@ -128,11 +131,10 @@ fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int
     val imagePainter = rememberAsyncImagePainter(model = anime.coverImage?.large)
     val transition by animateFloatAsState(
         targetValue = if (imagePainter.state.collectAsState().value is AsyncImagePainter.State.Success) 1f else 0f,
+        animationSpec = tween(durationMillis = 500),
         label = "loadingTransition",
     )
-    Box(
-        modifier = Modifier.alpha(transition)
-    ) {
+    Box {
         Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -153,11 +155,13 @@ fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int
         ) {
             Image(
                 modifier = modifier
-                    .clip(RoundedCornerShape(8.dp))
                     .height(140.dp)
-                    .width(100.dp),
+                    .width(100.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop,
                 painter = imagePainter,
                 contentDescription = "anime thumbnail",
+                alpha = transition
             )
             Column(modifier = modifier.fillMaxWidth()) {
                 Text(

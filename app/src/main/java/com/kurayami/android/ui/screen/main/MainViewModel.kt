@@ -37,7 +37,7 @@ class MainViewModel @Inject constructor(
             25,
             MediaType.ANIME,
             listOf(MediaSort.SCORE_DESC)
-        ).onCompletion { _uiState.update { it.copy(isLoading = false) } }.cachedIn(viewModelScope)
+        ).cachedIn(viewModelScope)
     }
 
     override fun manageIntentData(data: Uri?) {
