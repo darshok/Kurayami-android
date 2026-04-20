@@ -5,21 +5,37 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -30,8 +46,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import coil3.compose.AsyncImagePainter
-import coil3.compose.rememberAsyncImagePainter
+import coil3.compose.AsyncImage
 import com.kurayami.android.R
 import com.kurayami.android.ui.screen.main.composable.BottomNavigation
 import com.kurayami.android.ui.theme.KurayamiTheme
@@ -107,7 +122,11 @@ fun TopAnimeChart(
             .padding(horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(topAnimeList.itemCount) { index ->
+        items(
+            count = topAnimeList.itemCount,
+            key = { index -> topAnimeList.peek(index)?.id ?: index },
+            contentType = { "Anime" }
+        ) { index ->
             topAnimeList[index]?.let { anime ->
                 AnimeCard(anime, index + 1)
             }
@@ -128,13 +147,14 @@ fun AnimeCard(anime: MediaTopChartQuery.Medium, index: Int) {
 
 @Composable
 fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int) {
-    val imagePainter = rememberAsyncImagePainter(model = anime.coverImage?.large)
-    val transition by animateFloatAsState(
-        targetValue = if (imagePainter.state.collectAsState().value is AsyncImagePainter.State.Success) 1f else 0f,
-        animationSpec = tween(durationMillis = 500),
+    var isLoaded by remember { mutableStateOf(false) }
+    val alpha by animateFloatAsState(
+        targetValue = if (isLoaded) 1f else 0f,
         label = "loadingTransition",
+        animationSpec = tween(durationMillis = 300)
     )
-    Box {
+
+    Box(modifier = Modifier.graphicsLayer { this.alpha = alpha }) {
         Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
@@ -153,15 +173,15 @@ fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int
             modifier = modifier.padding(end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
+            AsyncImage(
                 modifier = modifier
                     .height(140.dp)
                     .width(100.dp)
                     .clip(RoundedCornerShape(8.dp)),
                 contentScale = ContentScale.Crop,
-                painter = imagePainter,
+                model = anime.coverImage?.large,
                 contentDescription = "anime thumbnail",
-                alpha = transition
+                onSuccess = { isLoaded = true },
             )
             Column(modifier = modifier.fillMaxWidth()) {
                 Text(
