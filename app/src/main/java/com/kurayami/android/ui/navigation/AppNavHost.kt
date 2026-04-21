@@ -8,8 +8,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.kurayami.android.ui.screen.main.MainViewModel
-import com.kurayami.android.ui.screen.mylist.MyListScreen
-import com.kurayami.android.ui.screen.topcharts.TopChartsScreen
+import com.kurayami.android.ui.screen.main.mylist.MyListScreen
+import com.kurayami.android.ui.screen.main.topcharts.TopChartsScreen
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable

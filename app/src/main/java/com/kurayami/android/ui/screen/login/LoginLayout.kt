@@ -1,10 +1,8 @@
 package com.kurayami.android.ui.screen.login
 
-import android.content.ActivityNotFoundException
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,6 +16,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.kurayami.android.BuildConfig
 import com.kurayami.android.R
+import com.kurayami.common.ANILIST_AUTH_URL
+import androidx.core.net.toUri
 
 @Composable
 fun LoginLayout(modifier: Modifier) {
@@ -28,18 +28,18 @@ fun LoginLayout(modifier: Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {
-        Button(onClick = { context.startActionView("https://anilist.co/api/v2/oauth/authorize?client_id=${BuildConfig.CLIENT_ID}&response_type=token") }) {
+        Button(onClick = {
+            val authUrl = "$ANILIST_AUTH_URL?client_id=${BuildConfig.CLIENT_ID}&response_type=token"
+            context.launchCustomTab(authUrl)
+        }) {
             Text(text = stringResource(id = R.string.login))
         }
     }
 }
 
-private fun Context.startActionView(uri: String) {
-    try {
-        with(Intent(Intent.ACTION_VIEW, Uri.parse(uri))) {
-            startActivity(this)
-        }
-    } catch (e: ActivityNotFoundException) {
-        Toast.makeText(this, getString(R.string.no_app_found_for_this_action), Toast.LENGTH_SHORT).show()
-    }
+private fun Context.launchCustomTab(url: String) {
+    val customTabsIntent = CustomTabsIntent.Builder()
+        .setShowTitle(true)
+        .build()
+    customTabsIntent.launchUrl(this, url.toUri())
 }
