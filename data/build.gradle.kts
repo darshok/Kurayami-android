@@ -1,6 +1,5 @@
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.apollo)
@@ -11,7 +10,7 @@ val dataPackageName = "com.kurayami.data"
 
 android {
     namespace = dataPackageName
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         minSdk = 24
@@ -33,8 +32,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_1_8)
+        }
     }
 }
 
@@ -49,11 +51,8 @@ apollo {
 }
 
 dependencies {
-
     // Core
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
 
     // Serialization
     implementation(libs.kotlinx.serialization.json)
@@ -68,7 +67,6 @@ dependencies {
     // Hilt
     implementation(libs.dagger.hilt)
     ksp(libs.dagger.hilt.compiler)
-
 
     // Datastore
     implementation(libs.androidx.datastore.preferences)
