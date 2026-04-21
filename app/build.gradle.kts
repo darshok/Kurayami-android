@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.ksp)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 val appPackageName = "com.kurayami.android"
@@ -78,6 +79,10 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+    implementation(libs.androidx.navigation.compose)
+
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
 
     // Ui
     implementation(libs.androidx.ui)

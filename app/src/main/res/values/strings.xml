@@ -4,4 +4,6 @@
     <string name="logout">Logout</string>
     <string name="no_app_found_for_this_action">No app found for this action</string>
     <string name="top_anime_title">Top Anime in AniList</string>
+    <string name="my_list_title">My list</string>
+    <string name="top_charts_title">Top charts</string>
 </resources>

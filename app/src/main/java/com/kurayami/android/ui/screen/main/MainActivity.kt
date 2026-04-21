@@ -22,12 +22,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.kurayami.android.R
 import com.kurayami.android.ui.components.AnimeCard
 import com.kurayami.android.ui.components.BottomNavigation
+import com.kurayami.android.ui.navigation.AppNavHost
+import com.kurayami.android.ui.navigation.AppRoutes
 import com.kurayami.android.ui.theme.KurayamiTheme
 import com.kurayami.data.MediaTopChartQuery
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,11 +50,9 @@ class MainActivity : ComponentActivity() {
         viewModel.manageIntentData(intent.data)
 
         setContent {
-            val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsStateWithLifecycle(false)
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val topAnimeList = viewModel.topChartFlow.collectAsLazyPagingItems()
+            val navController = rememberNavController()
             KurayamiTheme {
-                MainScaffold(isUserLoggedIn, uiState, topAnimeList, viewModel::logout)
+                MainScaffold(navController, viewModel)
             }
         }
     }
@@ -58,33 +61,33 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(
-    isUserLoggedIn: Boolean,
-    uiState: MediaTopChartUiState,
-    topAnimeList: LazyPagingItems<MediaTopChartQuery.Medium>,
-    logoutAction: () -> Unit
+    navController: NavHostController,
+    viewModel: MainViewModel
 ) {
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        TopAppBar(title = {
-            Text(
-                stringResource(
-                    R.string.top_anime_title
-                )
-            )
-        })
-    }, bottomBar = {
-        BottomNavigation()
-    }) { innerPadding ->
-        // TODO: provisional way to test pagination
-        TopAnimeChart(modifier = Modifier.padding(innerPadding), uiState, topAnimeList)
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+    
+    val titleRes = when {
+        currentDestination?.hierarchy?.any { it.hasRoute<AppRoutes.MyList>() } == true -> R.string.my_list_title
+        else -> R.string.top_anime_title
+    }
 
-//        // TODO: provisional way to test login/logout
-//        if (isUserLoggedIn) {
-//            LogoutButtonLayout(
-//                modifier = Modifier.padding(innerPadding),
-//                onClickLogout = { logoutAction() })
-//        } else {
-//            LoginLayout(modifier = Modifier.padding(innerPadding))
-//        }
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(title = {
+                Text(stringResource(titleRes))
+            })
+        },
+        bottomBar = {
+            BottomNavigation(navController)
+        }
+    ) { innerPadding ->
+        AppNavHost(
+            navController = navController,
+            modifier = Modifier.padding(innerPadding),
+            viewModel = viewModel
+        )
     }
 }
 

@@ -43,8 +43,10 @@ class MainViewModel @Inject constructor(
     override fun manageIntentData(data: Uri?) {
         data?.let { dataUri ->
             viewModelScope.launch {
-                if (isAuthenticationUri(dataUri)) {
-                    loginRepository.manageLoginData(dataUri)
+                when {
+                    isAuthenticationUri(dataUri) -> {
+                        loginRepository.manageLoginData(dataUri)
+                    }
                 }
             }
         }

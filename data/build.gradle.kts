@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.google.ksp)
     alias(libs.plugins.apollo)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 val dataPackageName = "com.kurayami.data"
@@ -53,6 +54,9 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
+
+    // Serialization
+    implementation(libs.kotlinx.serialization.json)
 
     // Okhttp
     implementation(libs.okhttp.logging.interceptor)
