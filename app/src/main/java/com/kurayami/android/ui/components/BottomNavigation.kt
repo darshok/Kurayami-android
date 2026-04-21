@@ -1,4 +1,4 @@
-package com.kurayami.android.ui.screen.main.composable
+package com.kurayami.android.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
