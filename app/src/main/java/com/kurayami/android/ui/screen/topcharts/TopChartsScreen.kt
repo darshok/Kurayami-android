@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -17,9 +17,9 @@ import com.kurayami.data.MediaTopChartQuery
 
 @Composable
 fun TopChartsScreen(
-    modifier: Modifier = Modifier,
-    viewModel: TopChartsViewModel = hiltViewModel()
+    modifier: Modifier = Modifier
 ) {
+    val viewModel: TopChartsViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val topAnimeList = viewModel.topChartFlow.collectAsLazyPagingItems()
 
