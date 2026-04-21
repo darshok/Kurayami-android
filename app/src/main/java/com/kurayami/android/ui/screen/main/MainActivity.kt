@@ -5,50 +5,31 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import coil3.compose.AsyncImage
 import com.kurayami.android.R
+import com.kurayami.android.ui.components.AnimeCard
+import com.kurayami.android.ui.components.BottomNavigation
 import com.kurayami.android.ui.theme.KurayamiTheme
 import com.kurayami.data.MediaTopChartQuery
-import com.kurayami.data.type.MediaFormat
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -64,8 +45,11 @@ class MainActivity : ComponentActivity() {
         viewModel.manageIntentData(intent.data)
 
         setContent {
+            val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsStateWithLifecycle(false)
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val topAnimeList = viewModel.topChartFlow.collectAsLazyPagingItems()
             KurayamiTheme {
-                BaseScaffold(viewModel)
+                MainScaffold(isUserLoggedIn, uiState, topAnimeList, viewModel::logout)
             }
         }
     }
@@ -73,9 +57,12 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BaseScaffold(viewModel: MainViewModel) {
-    val isUserLoggedIn by viewModel.isUserLoggedIn.collectAsStateWithLifecycle(false)
-
+fun MainScaffold(
+    isUserLoggedIn: Boolean,
+    uiState: MediaTopChartUiState,
+    topAnimeList: LazyPagingItems<MediaTopChartQuery.Medium>,
+    logoutAction: () -> Unit
+) {
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         TopAppBar(title = {
             Text(
@@ -84,15 +71,17 @@ fun BaseScaffold(viewModel: MainViewModel) {
                 )
             )
         })
+    }, bottomBar = {
+        BottomNavigation()
     }) { innerPadding ->
         // TODO: provisional way to test pagination
-        TopAnimeChart(modifier = Modifier.padding(innerPadding))
+        TopAnimeChart(modifier = Modifier.padding(innerPadding), uiState, topAnimeList)
 
-        // TODO: provisional way to test login/logout
+//        // TODO: provisional way to test login/logout
 //        if (isUserLoggedIn) {
 //            LogoutButtonLayout(
 //                modifier = Modifier.padding(innerPadding),
-//                onClickLogout = { viewModel.logout() })
+//                onClickLogout = { logoutAction() })
 //        } else {
 //            LoginLayout(modifier = Modifier.padding(innerPadding))
 //        }
@@ -100,13 +89,15 @@ fun BaseScaffold(viewModel: MainViewModel) {
 }
 
 @Composable
-fun TopAnimeChart(modifier: Modifier = Modifier, viewModel: MainViewModel = hiltViewModel()) {
-    val topAnimeList = viewModel.topChartFlow.collectAsLazyPagingItems()
-
+fun TopAnimeChart(
+    modifier: Modifier = Modifier,
+    uiState: MediaTopChartUiState,
+    topAnimeList: LazyPagingItems<MediaTopChartQuery.Medium>
+) {
     LazyColumn(
         modifier = modifier
             .fillMaxSize()
-            .padding(8.dp),
+            .padding(horizontal = 8.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(
@@ -116,71 +107,6 @@ fun TopAnimeChart(modifier: Modifier = Modifier, viewModel: MainViewModel = hilt
         ) { index ->
             topAnimeList[index]?.let { anime ->
                 AnimeCard(anime, index + 1)
-            }
-        }
-    }
-}
-
-@Composable
-fun AnimeCard(anime: MediaTopChartQuery.Medium, index: Int) {
-    Card(
-        modifier = Modifier.fillMaxWidth().height(140.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-    ) {
-        CardContent(Modifier.padding(8.dp), anime, index)
-    }
-}
-
-@Composable
-fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int) {
-    var isLoaded by remember { mutableStateOf(false) }
-    val alpha by animateFloatAsState(
-        targetValue = if (isLoaded) 1f else 0f,
-        label = "loadingTransition",
-        animationSpec = tween(durationMillis = 300)
-    )
-
-    Box(
-        modifier = Modifier.graphicsLayer { this.alpha = alpha }
-    ) {
-        Row(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .clip(RoundedCornerShape(bottomStart = 16.dp, topEnd = 8.dp))
-                .background(MaterialTheme.colorScheme.onPrimaryContainer)
-                .padding(horizontal = 8.dp, vertical = 4.dp)
-        ) {
-            Text(
-                text = index.toString(),
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp,
-                color = MaterialTheme.colorScheme.onTertiary
-            )
-        }
-        Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-            AsyncImage(
-                modifier = Modifier.clip(RoundedCornerShape(8.dp)),
-                model = anime.coverImage?.large,
-                contentDescription = "anime thumbnail",
-                onSuccess = { isLoaded = true }
-            )
-            Column(modifier = Modifier.fillMaxWidth().padding(start = 8.dp)) {
-                Text(
-                    text = anime.title?.userPreferred ?: "No title",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp,
-                )
-                Row(modifier = Modifier.padding(top = 4.dp)) {
-                    val subtitleFontSize = 16.sp
-                    Text(text = anime.seasonYear?.toString() ?: "---", fontSize = subtitleFontSize)
-                    Text(
-                        modifier = Modifier.padding(horizontal = 8.dp),
-                        text = "-",
-                        fontSize = subtitleFontSize
-                    )
-                    Text(text = anime.averageScore?.toString() ?: "---", fontSize = subtitleFontSize)
-                }
             }
         }
     }
@@ -200,23 +126,4 @@ fun LogoutButtonLayout(modifier: Modifier = Modifier, onClickLogout: () -> Unit 
             Text(text = stringResource(id = R.string.logout))
         }
     }
-}
-
-@Preview
-@Composable
-fun AnimeCardPreview() {
-    AnimeCard(
-        anime = MediaTopChartQuery.Medium(
-            __typename = "",
-            id = 12,
-            title = MediaTopChartQuery.Title(userPreferred = "Title"),
-            seasonYear = 2020,
-            meanScore = 98,
-            averageScore = 98,
-            studios = MediaTopChartQuery.Studios(listOf(MediaTopChartQuery.Node(name = "Studio"))),
-            format = MediaFormat.TV,
-            coverImage = MediaTopChartQuery.CoverImage(large = "")
-        ),
-        index = 1
-    )
 }

@@ -10,7 +10,7 @@ val dataPackageName = "com.kurayami.data"
 
 android {
     namespace = dataPackageName
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
