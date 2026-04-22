@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kurayami.android.R
-import com.kurayami.android.ui.screen.login.LoginLayout
+import com.kurayami.android.ui.screen.login.LoginScreen
 import com.kurayami.android.ui.screen.main.MainViewModel
 
 @Composable
@@ -28,7 +28,7 @@ fun MyListScreen(
             modifier = modifier,
             onClickLogout = { viewModel.logout() })
     } else {
-        LoginLayout(modifier = modifier)
+        LoginScreen(modifier = modifier)
     }
 }
 

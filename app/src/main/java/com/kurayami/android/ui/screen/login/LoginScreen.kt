@@ -1,7 +1,6 @@
 package com.kurayami.android.ui.screen.login
 
 import android.content.Context
-import android.net.Uri
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,7 +19,7 @@ import com.kurayami.common.ANILIST_AUTH_URL
 import androidx.core.net.toUri
 
 @Composable
-fun LoginLayout(modifier: Modifier) {
+fun LoginScreen(modifier: Modifier) {
     val context = LocalContext.current
 
     Column(
