@@ -30,13 +30,18 @@ fun AppNavHost(
             }
             composable<AppRoutes.TopCharts> {
                 TopChartsScreen(
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this,
                     onItemClick = { id ->
                         navController.navigate(AppRoutes.MediaDetails(id))
                     }
                 )
             }
             composable<AppRoutes.MediaDetails> {
-                MediaDetailsScreen()
+                MediaDetailsScreen(
+                    sharedTransitionScope = this@SharedTransitionLayout,
+                    animatedVisibilityScope = this
+                )
             }
         }
     }

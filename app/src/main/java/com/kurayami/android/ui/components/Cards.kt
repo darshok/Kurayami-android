@@ -1,6 +1,11 @@
 package com.kurayami.android.ui.components
 
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -35,19 +40,41 @@ import coil3.compose.AsyncImage
 import com.kurayami.data.MediaTopChartQuery
 import com.kurayami.data.type.MediaFormat
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun AnimeCard(anime: MediaTopChartQuery.Medium, index: Int, onClick: () -> Unit = {}) {
+fun AnimeCard(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+    anime: MediaTopChartQuery.Medium,
+    index: Int,
+    onClick: () -> Unit = {}
+) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
     ) {
-        CardContent(Modifier.padding(8.dp), anime, index)
+        CardContent(
+            modifier = Modifier.padding(8.dp),
+            anime = anime,
+            index = index,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedVisibilityScope = animatedVisibilityScope
+        )
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int) {
+fun CardContent(
+    modifier: Modifier,
+    anime: MediaTopChartQuery.Medium,
+    index: Int,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope
+) {
     var isLoaded by remember { mutableStateOf(false) }
     val alpha by animateFloatAsState(
         targetValue = if (isLoaded) 1f else 0f,
@@ -74,16 +101,22 @@ fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int
             modifier = modifier.padding(end = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                modifier = modifier
-                    .height(140.dp)
-                    .width(100.dp)
-                    .clip(RoundedCornerShape(8.dp)),
-                contentScale = ContentScale.Crop,
-                model = anime.coverImage?.large,
-                contentDescription = "anime thumbnail",
-                onSuccess = { isLoaded = true },
-            )
+            with(sharedTransitionScope) {
+                AsyncImage(
+                    modifier = modifier
+                        .height(140.dp)
+                        .width(100.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .sharedElement(
+                            sharedContentState = rememberSharedContentState(key = "cover-${anime.id}"),
+                            animatedVisibilityScope = animatedVisibilityScope
+                        ),
+                    contentScale = ContentScale.Crop,
+                    model = anime.coverImage?.large,
+                    contentDescription = "anime thumbnail",
+                    onSuccess = { isLoaded = true },
+                )
+            }
             Column(modifier = modifier.fillMaxWidth()) {
                 Text(
                     modifier = modifier,
@@ -110,21 +143,28 @@ fun CardContent(modifier: Modifier, anime: MediaTopChartQuery.Medium, index: Int
 }
 
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Preview
 @Composable
 fun AnimeCardPreview() {
-    AnimeCard(
-        anime = MediaTopChartQuery.Medium(
-            __typename = "",
-            id = 12,
-            title = MediaTopChartQuery.Title(userPreferred = "Title"),
-            seasonYear = 2020,
-            meanScore = 98,
-            averageScore = 98,
-            studios = MediaTopChartQuery.Studios(listOf(MediaTopChartQuery.Node(name = "Studio"))),
-            format = MediaFormat.TV,
-            coverImage = MediaTopChartQuery.CoverImage(large = "")
-        ),
-        index = 1
-    )
+    SharedTransitionLayout {
+        AnimatedVisibility(visible = true) {
+            AnimeCard(
+                sharedTransitionScope = this@SharedTransitionLayout,
+                animatedVisibilityScope = this,
+                anime = MediaTopChartQuery.Medium(
+                    __typename = "",
+                    id = 12,
+                    title = MediaTopChartQuery.Title(userPreferred = "Title"),
+                    seasonYear = 2020,
+                    meanScore = 98,
+                    averageScore = 98,
+                    studios = MediaTopChartQuery.Studios(listOf(MediaTopChartQuery.Node(name = "Studio"))),
+                    format = MediaFormat.TV,
+                    coverImage = MediaTopChartQuery.CoverImage(large = "")
+                ),
+                index = 1
+            )
+        }
+    }
 }

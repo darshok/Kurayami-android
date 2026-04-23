@@ -1,5 +1,8 @@
 package com.kurayami.android.ui.screen.mediadetails
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,8 +38,11 @@ import coil3.compose.AsyncImage
 import com.kurayami.android.ui.common.UiState
 import com.kurayami.android.ui.screen.topcharts.ErrorMessage
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun MediaDetailsScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
     viewModel: MediaDetailsViewModel = hiltViewModel()
 ) {
@@ -47,6 +53,7 @@ fun MediaDetailsScreen(
             is UiState.Loading -> {
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
+
             is UiState.Error -> {
                 ErrorMessage(
                     modifier = Modifier.align(Alignment.Center),
@@ -54,6 +61,7 @@ fun MediaDetailsScreen(
                     onClickRetry = { /* Handle retry logic if implemented */ }
                 )
             }
+
             is UiState.Success -> {
                 val media = state.data.Media
                 if (media != null) {
@@ -75,7 +83,7 @@ fun MediaDetailsScreen(
                                         .height(250.dp)
                                         .background(Color.Black.copy(alpha = 0.5f))
                                 )
-                                
+
                                 Row(
                                     modifier = Modifier
                                         .align(Alignment.BottomStart)
@@ -84,16 +92,24 @@ fun MediaDetailsScreen(
                                     horizontalArrangement = Arrangement.spacedBy(16.dp),
                                     verticalAlignment = Alignment.Bottom
                                 ) {
-                                    AsyncImage(
-                                        model = media.coverImage?.large,
-                                        contentDescription = "Cover Image",
-                                        contentScale = ContentScale.Crop,
-                                        modifier = Modifier
-                                            .width(100.dp)
-                                            .height(150.dp)
-                                            .clip(RoundedCornerShape(8.dp))
-                                    )
-                                    
+                                    with(sharedTransitionScope) {
+                                        AsyncImage(
+                                            model = media.coverImage?.large,
+                                            contentDescription = "Cover Image",
+                                            contentScale = ContentScale.Crop,
+                                            modifier = Modifier
+                                                .width(100.dp)
+                                                .height(150.dp)
+                                                .clip(RoundedCornerShape(8.dp))
+                                                .sharedElement(
+                                                    sharedContentState = rememberSharedContentState(
+                                                        key = "cover-${media.id}"
+                                                    ),
+                                                    animatedVisibilityScope = animatedVisibilityScope
+                                                )
+                                        )
+                                    }
+
                                     Column(modifier = Modifier.padding(bottom = 8.dp)) {
                                         val title = media.title
                                         Text(
@@ -102,7 +118,7 @@ fun MediaDetailsScreen(
                                             fontWeight = FontWeight.Bold,
                                             color = Color.White
                                         )
-                                        
+
                                         val englishTitle = title?.english
                                         val userPreferredTitle = title?.userPreferred
                                         if (englishTitle != null && englishTitle != userPreferredTitle) {
@@ -116,7 +132,7 @@ fun MediaDetailsScreen(
                                 }
                             }
                         }
-                        
+
                         item {
                             Column(modifier = Modifier.padding(16.dp)) {
                                 val genres = media.genres
@@ -148,7 +164,9 @@ fun MediaDetailsScreen(
                                             .padding(16.dp),
                                         horizontalArrangement = Arrangement.SpaceEvenly
                                     ) {
-                                        InfoItem("Score", media.averageScore?.let { "$it%" } ?: "N/A")
+                                        InfoItem(
+                                            "Score",
+                                            media.averageScore?.let { "$it%" } ?: "N/A")
                                         InfoItem("Format", media.format?.name ?: "N/A")
                                         InfoItem("Episodes", media.episodes?.toString() ?: "N/A")
                                         InfoItem("Status", media.status?.name ?: "N/A")
@@ -161,7 +179,7 @@ fun MediaDetailsScreen(
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(bottom = 8.dp)
                                 )
-                                
+
                                 Text(
                                     text = media.description ?: "No description available.",
                                     style = MaterialTheme.typography.bodyMedium,

@@ -1,5 +1,8 @@
 package com.kurayami.android.ui.screen.topcharts
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,8 +33,11 @@ import com.kurayami.android.ui.common.UiState
 import com.kurayami.android.ui.components.AnimeCard
 import com.kurayami.data.MediaTopChartQuery
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun TopChartsScreen(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
     viewModel: TopChartsViewModel = hiltViewModel(),
     onItemClick: (Int) -> Unit = {}
@@ -69,6 +75,8 @@ fun TopChartsScreen(
 
             is UiState.Success -> {
                 TopAnimeChart(
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
                     modifier = Modifier.fillMaxSize(),
                     topAnimeList = topAnimeList,
                     onItemClick = onItemClick
@@ -78,8 +86,11 @@ fun TopChartsScreen(
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun TopAnimeChart(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
     topAnimeList: LazyPagingItems<MediaTopChartQuery.Medium>,
     onItemClick: (Int) -> Unit = {}
@@ -96,7 +107,13 @@ fun TopAnimeChart(
             contentType = topAnimeList.itemContentType { "Anime" }
         ) { index ->
             topAnimeList[index]?.let { anime ->
-                AnimeCard(anime, index + 1, onClick = { onItemClick(anime.id) })
+                AnimeCard(
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope,
+                    anime = anime,
+                    index = index + 1,
+                    onClick = { onItemClick(anime.id) }
+                )
             }
         }
 
