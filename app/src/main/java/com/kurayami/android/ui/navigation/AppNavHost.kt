@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.kurayami.android.ui.screen.main.MainViewModel
+import com.kurayami.android.ui.screen.mediadetails.MediaDetailsScreen
 import com.kurayami.android.ui.screen.mylist.MyListScreen
 import com.kurayami.android.ui.screen.topcharts.TopChartsScreen
 
@@ -28,7 +29,14 @@ fun AppNavHost(
                 MyListScreen(viewModel = viewModel)
             }
             composable<AppRoutes.TopCharts> {
-                TopChartsScreen()
+                TopChartsScreen(
+                    onItemClick = { id ->
+                        navController.navigate(AppRoutes.MediaDetails(id))
+                    }
+                )
+            }
+            composable<AppRoutes.MediaDetails> {
+                MediaDetailsScreen()
             }
         }
     }

@@ -33,7 +33,8 @@ import com.kurayami.data.MediaTopChartQuery
 @Composable
 fun TopChartsScreen(
     modifier: Modifier = Modifier,
-    viewModel: TopChartsViewModel = hiltViewModel()
+    viewModel: TopChartsViewModel = hiltViewModel(),
+    onItemClick: (Int) -> Unit = {}
 ) {
     val topAnimeList = viewModel.topCharts.collectAsLazyPagingItems()
 
@@ -69,7 +70,8 @@ fun TopChartsScreen(
             is UiState.Success -> {
                 TopAnimeChart(
                     modifier = Modifier.fillMaxSize(),
-                    topAnimeList = topAnimeList
+                    topAnimeList = topAnimeList,
+                    onItemClick = onItemClick
                 )
             }
         }
@@ -79,7 +81,8 @@ fun TopChartsScreen(
 @Composable
 fun TopAnimeChart(
     modifier: Modifier = Modifier,
-    topAnimeList: LazyPagingItems<MediaTopChartQuery.Medium>
+    topAnimeList: LazyPagingItems<MediaTopChartQuery.Medium>,
+    onItemClick: (Int) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
@@ -93,7 +96,7 @@ fun TopAnimeChart(
             contentType = topAnimeList.itemContentType { "Anime" }
         ) { index ->
             topAnimeList[index]?.let { anime ->
-                AnimeCard(anime, index + 1)
+                AnimeCard(anime, index + 1, onClick = { onItemClick(anime.id) })
             }
         }
 

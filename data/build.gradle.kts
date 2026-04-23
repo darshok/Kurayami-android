@@ -77,6 +77,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 
     // Apollo
-    implementation(libs.apollo.runtime)
+    api(libs.apollo.runtime)
     implementation(libs.apollo.normalized.cache)
 }

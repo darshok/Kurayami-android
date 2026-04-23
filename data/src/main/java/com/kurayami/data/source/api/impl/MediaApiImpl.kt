@@ -2,6 +2,7 @@ package com.kurayami.data.source.api.impl
 
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
+import com.kurayami.data.MediaDetailsQuery
 import com.kurayami.data.MediaTopChartQuery
 import com.kurayami.data.source.api.MediaApi
 import com.kurayami.data.type.MediaSort
@@ -16,6 +17,13 @@ class MediaApiImpl @Inject constructor(private val client: ApolloClient) : Media
                 perPage = Optional.present(perPage),
                 type = Optional.present(type),
                 sort = Optional.present(sort)
+            )
+        )
+
+    override fun getMediaDetails(id: Int) =
+        client.query(
+            MediaDetailsQuery(
+                id = Optional.present(id)
             )
         )
 }

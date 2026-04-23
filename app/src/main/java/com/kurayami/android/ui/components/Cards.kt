@@ -1,8 +1,10 @@
 package com.kurayami.android.ui.components
 
+
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,11 +35,10 @@ import coil3.compose.AsyncImage
 import com.kurayami.data.MediaTopChartQuery
 import com.kurayami.data.type.MediaFormat
 
-
 @Composable
-fun AnimeCard(anime: MediaTopChartQuery.Medium, index: Int) {
+fun AnimeCard(anime: MediaTopChartQuery.Medium, index: Int, onClick: () -> Unit = {}) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
     ) {

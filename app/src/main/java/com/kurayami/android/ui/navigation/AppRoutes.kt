@@ -8,4 +8,7 @@ sealed interface AppRoutes {
 
     @Serializable
     data object TopCharts : AppRoutes
+
+    @Serializable
+    data class MediaDetails(val id: Int) : AppRoutes
 }
