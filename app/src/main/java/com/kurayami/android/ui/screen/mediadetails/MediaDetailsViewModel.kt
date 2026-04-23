@@ -25,9 +25,9 @@ class MediaDetailsViewModel @Inject constructor(
 
     init {
         val id: Int? = savedStateHandle["id"]
-        if (id != null) {
-            getMediaDetails(id)
-        } else {
+        id?.let {
+            getMediaDetails(it)
+        } ?: {
             _uiState.value = UiState.Error(message = "Media ID not found")
         }
     }
@@ -39,11 +39,9 @@ class MediaDetailsViewModel @Inject constructor(
                     _uiState.value = UiState.Error(message = e.localizedMessage, throwable = e)
                 }
                 .collect { data ->
-                    if (data != null) {
-                        _uiState.value = UiState.Success(data)
-                    } else {
-                        _uiState.value = UiState.Error(message = "No data found")
-                    }
+                    _uiState.value = data?.let {
+                        UiState.Success(it)
+                    } ?: UiState.Error(message = "No data found")
                 }
         }
     }
