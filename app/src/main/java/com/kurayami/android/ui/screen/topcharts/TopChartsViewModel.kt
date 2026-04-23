@@ -1,4 +1,4 @@
-package com.kurayami.android.ui.screen.main.topcharts
+package com.kurayami.android.ui.screen.topcharts
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

@@ -1,4 +1,4 @@
-package com.kurayami.android.ui.screen.main.topcharts
+package com.kurayami.android.ui.screen.topcharts
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

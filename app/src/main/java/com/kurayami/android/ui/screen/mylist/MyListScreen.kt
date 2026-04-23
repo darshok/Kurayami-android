@@ -1,4 +1,4 @@
-package com.kurayami.android.ui.screen.main.mylist
+package com.kurayami.android.ui.screen.mylist
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
