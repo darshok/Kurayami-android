@@ -73,5 +73,3 @@ lint/tmp/
 app/release/output.json
 .idea/codeStyles/
 /gradle/gradle-daemon-jvm.properties
-/Agent.md
-/.github
