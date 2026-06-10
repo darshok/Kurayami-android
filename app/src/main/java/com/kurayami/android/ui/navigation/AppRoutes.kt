@@ -1,8 +1,9 @@
 package com.kurayami.android.ui.navigation
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-sealed interface AppRoutes {
+sealed interface AppRoutes : NavKey {
     @Serializable
     data object MyList : AppRoutes
 

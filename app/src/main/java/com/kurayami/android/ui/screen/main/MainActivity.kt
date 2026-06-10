@@ -12,19 +12,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
 import com.kurayami.android.R
 import com.kurayami.android.ui.components.BottomNavigation
 import com.kurayami.android.ui.navigation.AppNavHost
 import com.kurayami.android.ui.navigation.AppRoutes
+import com.kurayami.android.ui.navigation.Navigator
+import com.kurayami.android.ui.navigation.rememberNavigationState
 import com.kurayami.android.ui.theme.KurayamiTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -41,9 +38,14 @@ class MainActivity : ComponentActivity() {
         viewModel.manageIntentData(intent.data)
 
         setContent {
-            val navController = rememberNavController()
+            val navigationState = rememberNavigationState(
+                startRoute = AppRoutes.TopCharts,
+                topLevelRoutes = setOf(AppRoutes.TopCharts, AppRoutes.MyList)
+            )
+            val navigator = remember { Navigator(navigationState) }
+            
             KurayamiTheme {
-                MainScaffold(navController, viewModel)
+                MainScaffold(navigationState, navigator, viewModel)
             }
         }
     }
@@ -52,14 +54,14 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScaffold(
-    navController: NavHostController,
+    navigationState: com.kurayami.android.ui.navigation.NavigationState,
+    navigator: Navigator,
     viewModel: MainViewModel
 ) {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination
+    val currentDestination = navigationState.backStacks[navigationState.topLevelRoute]?.last()
     
-    val titleRes = when {
-        currentDestination?.hierarchy?.any { it.hasRoute<AppRoutes.MyList>() } == true -> R.string.my_list_title
+    val titleRes = when (currentDestination) {
+        is AppRoutes.MyList -> R.string.my_list_title
         else -> R.string.top_anime_title
     }
 
@@ -71,11 +73,12 @@ fun MainScaffold(
             })
         },
         bottomBar = {
-            BottomNavigation(navController)
+            BottomNavigation(navigationState, navigator)
         }
     ) { innerPadding ->
         AppNavHost(
-            navController = navController,
+            navigationState = navigationState,
+            navigator = navigator,
             modifier = Modifier.padding(innerPadding),
             viewModel = viewModel
         )

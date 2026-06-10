@@ -33,7 +33,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil3.compose.AsyncImage
 import com.kurayami.android.ui.common.UiState
 import com.kurayami.android.ui.screen.topcharts.ErrorMessage
@@ -44,7 +43,7 @@ fun MediaDetailsScreen(
     sharedTransitionScope: SharedTransitionScope,
     animatedVisibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
-    viewModel: MediaDetailsViewModel = hiltViewModel()
+    viewModel: MediaDetailsViewModel
 ) {
     val uiState by viewModel.uiState.collectAsState()
 

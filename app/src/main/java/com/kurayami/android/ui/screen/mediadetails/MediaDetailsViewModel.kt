@@ -1,35 +1,31 @@
 package com.kurayami.android.ui.screen.mediadetails
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kurayami.android.ui.common.UiState
 import com.kurayami.data.MediaDetailsQuery
 import com.kurayami.data.repository.MediaRepository
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class MediaDetailsViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = MediaDetailsViewModel.Factory::class)
+class MediaDetailsViewModel @AssistedInject constructor(
     private val repository: MediaRepository,
-    savedStateHandle: SavedStateHandle
+    @Assisted private val id: Int
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState<MediaDetailsQuery.Data>>(UiState.Loading)
     val uiState: StateFlow<UiState<MediaDetailsQuery.Data>> = _uiState.asStateFlow()
 
     init {
-        val id: Int? = savedStateHandle["id"]
-        id?.let {
-            getMediaDetails(it)
-        } ?: {
-            _uiState.value = UiState.Error(message = "Media ID not found")
-        }
+        getMediaDetails(id)
     }
 
     fun getMediaDetails(id: Int) {
@@ -44,5 +40,10 @@ class MediaDetailsViewModel @Inject constructor(
                     } ?: UiState.Error(message = "No data found")
                 }
         }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(id: Int): MediaDetailsViewModel
     }
 }
