@@ -2,6 +2,10 @@ package com.kurayami.android.ui.navigation
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -28,7 +32,7 @@ fun AppNavHost(
             entry<AppRoutes.MyList> {
                 MyListScreen(viewModel = viewModel)
             }
-            entry<AppRoutes.TopCharts> { key ->
+            entry<AppRoutes.TopCharts> { _ ->
                 TopChartsScreen(
                     sharedTransitionScope = this@SharedTransitionLayout,
                     animatedVisibilityScope = LocalNavAnimatedContentScope.current,
@@ -55,6 +59,14 @@ fun AppNavHost(
             entries = navigationState.toEntries(entryProvider),
             onBack = { navigator.goBack() },
             sharedTransitionScope = this@SharedTransitionLayout,
+            popTransitionSpec = {
+                fadeIn(animationSpec = tween(500)) togetherWith
+                        fadeOut(animationSpec = tween(500))
+            },
+            predictivePopTransitionSpec = {
+                fadeIn(animationSpec = tween(500)) togetherWith
+                        fadeOut(animationSpec = tween(500))
+            }
         )
     }
 }
